@@ -16,9 +16,19 @@ Uso: python3 assets/render.py
 """
 import os
 import shutil
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 
 BG = (0x1A, 0x08, 0x49)          # roxo da marca
+
+# Credito no rodape das splashes.
+CREDIT = "powered by Captaí+"
+CREDIT_COLOR = (0xFF, 0xFF, 0xFF)
+CREDIT_ALPHA = 150               # discreto: nao compete com o logotipo
+CREDIT_FONTS = (
+    "/System/Library/Fonts/Supplemental/Arial.ttf",
+    "/System/Library/Fonts/Helvetica.ttc",
+    "/Library/Fonts/Arial.ttf",
+)
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSETS = os.path.join(ROOT, "assets")
 SPLASH_SRC = os.path.join(ASSETS, "logo-splash.png")
@@ -106,6 +116,37 @@ def fit(art, size, ratio, canvas=None, bg=BG, alpha=False):
     return out
 
 
+def _credit_font(px):
+    """Fonte do credito no tamanho pedido; cai no bitmap padrao se faltar."""
+    for path in CREDIT_FONTS:
+        if os.path.exists(path):
+            try:
+                return ImageFont.truetype(path, px)
+            except OSError:
+                continue
+    return ImageFont.load_default()
+
+
+def add_credit(img, ratio=0.030, margin=0.055):
+    """
+    Escreve o credito centralizado no rodape.
+
+    `ratio` e `margin` sao fracoes da menor dimensao do canvas, entao o texto
+    mantem a mesma proporcao em todas as densidades e nas duas orientacoes.
+    """
+    base = min(img.size)
+    font = _credit_font(max(9, round(base * ratio)))
+    draw = ImageDraw.Draw(img)
+
+    box = draw.textbbox((0, 0), CREDIT, font=font)
+    x = (img.width - (box[2] - box[0])) // 2 - box[0]
+    y = img.height - round(base * margin) - (box[3] - box[1]) - box[1]
+
+    draw.text((x, y), CREDIT, font=font,
+              fill=CREDIT_COLOR + (CREDIT_ALPHA,))
+    return img
+
+
 def save(img, path, rgba=True):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     img.save(path, "PNG", optimize=True) if rgba else \
@@ -157,13 +198,13 @@ def main():
         "xxhdpi": (960, 1600), "xxxhdpi": (1280, 1920),
     }
     for d, (w, h) in splash.items():
-        port = fit(lockup, 0, 0.58, canvas=(w, h))
-        land = fit(lockup, 0, 0.48, canvas=(h, w))
+        port = add_credit(fit(lockup, 0, 0.58, canvas=(w, h)))
+        land = add_credit(fit(lockup, 0, 0.48, canvas=(h, w)))
         save(port, os.path.join(res, f"drawable-port-{d}", "splash.png"), rgba=False)
         save(land, os.path.join(res, f"drawable-land-{d}", "splash.png"), rgba=False)
 
     # drawable/splash.png: fallback sem qualificador de densidade.
-    save(fit(lockup, 0, 0.58, canvas=(480, 800)),
+    save(add_credit(fit(lockup, 0, 0.58, canvas=(480, 800))),
          os.path.join(res, "drawable", "splash.png"), rgba=False)
 
     # Android 12+: usa a marca completa como icone do splash para nao cortar
@@ -180,7 +221,9 @@ def main():
     # Splash universal 2732x2732: o iOS recorta esse quadrado para preencher
     # a tela, entao so a regiao central e garantida. O ratio fica abaixo do
     # usado no Android para a logo nao ser cortada em telas alongadas.
-    sp = fit(lockup, 2732, 0.46)
+    # A margem maior compensa o recorte: num iPhone alongado o rodape do
+    # quadrado fica fora da tela, e um credito colado na borda sumiria.
+    sp = add_credit(fit(lockup, 2732, 0.46), ratio=0.019, margin=0.245)
     for name in ("splash-2732x2732.png", "splash-2732x2732-1.png",
                  "splash-2732x2732-2.png"):
         save(sp, os.path.join(ios, "Splash.imageset", name), rgba=False)

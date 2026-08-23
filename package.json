@@ -2,7 +2,7 @@
   "name": "captai-app",
   "version": "1.0.0",
   "private": true,
-  "description": "Camada nativa (Ionic + Capacitor) para a aplicacao web Captaí",
+  "description": "Camada nativa (Ionic + Capacitor) para a aplicacao web Rede",
   "type": "module",
   "scripts": {
     "build": "vite build",
