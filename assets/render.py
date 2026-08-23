@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """
-Gera os icones e splashes do Captai a partir de assets/fundo-transparent.png.
+Gera os icones e splashes do app a partir das artes em assets/.
 
-O PNG de origem e o lockup completo (pin + "Captai+") sobre fundo transparente.
-Duas artes saem dele:
+  assets/logo-splash.png  -> splashes (logotipo completo)
+  assets/logo-icon.png    -> icones, se existir
 
-  pin     -> apenas a marca. Vai para os icones: em 48px o texto seria ilegivel.
-  lockup  -> pin + texto. Vai para as splashes, onde ha espaco de sobra.
+Sem logo-icon.png, o icone e derivado do proprio logo-splash: o simbolo e
+isolado cortando no maior vao de colunas transparentes da arte. Em 48px o
+texto de um logotipo vira borrao, por isso o icone nunca usa o lockup inteiro.
 
-O texto "Captai" e branco no arquivo de origem, por isso so aparece composto
-sobre o roxo da marca (#1A0849) — nunca sobre fundo claro.
+As artes devem ter fundo transparente; o roxo da marca (#1A0849) e composto
+aqui. Logotipos de texto branco so funcionam sobre esse fundo escuro.
 
 Uso: python3 assets/render.py
 """
@@ -19,12 +20,14 @@ from PIL import Image
 
 BG = (0x1A, 0x08, 0x49)          # roxo da marca
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SRC = os.path.join(ROOT, "assets", "fundo-transparent.png")
+ASSETS = os.path.join(ROOT, "assets")
+SPLASH_SRC = os.path.join(ASSETS, "logo-splash.png")
+ICON_SRC = os.path.join(ASSETS, "logo-icon.png")
 
-# Fracao da largura do lockup ocupada pelo simbolo para o icone do app.
-# O lockup completo e usado no splash; o icone precisa de um recorte mais
-# compacto para nao ficar ilegivel em tamanhos pequenos.
-ICON_SPLIT = 460
+# Largura minima de um vao de colunas transparentes, em fracao da largura da
+# arte, para que ele conte como separador entre simbolo e texto. Espacos
+# entre letras sao mais estreitos que isso e nao disparam o corte.
+GAP_RATIO = 0.012
 
 
 def _trim(img):
@@ -33,11 +36,57 @@ def _trim(img):
     return img.crop(box) if box else img
 
 
+def _split_symbol(lockup):
+    """
+    Isola o simbolo a esquerda do logotipo, cortando no vao MAIS LARGO de
+    colunas transparentes. Num lockup, o espaco que separa o simbolo do texto
+    e sempre maior que os espacos entre letras — e usar o maior vao, em vez do
+    primeiro acima de um limiar, mantem o corte correto quando a logo e
+    trocada por outra de proporcao diferente.
+
+    Sem vao interno (arte que ja e so o simbolo), devolve a arte inteira.
+    """
+    alpha = lockup.getchannel("A")
+    px = alpha.load()
+    w, h = lockup.size
+    filled = [any(px[x, y] > 8 for y in range(h)) for x in range(w)]
+
+    # Vaos internos: ignora as margens transparentes das pontas.
+    gaps = []
+    start = None
+    for x in range(w):
+        if not filled[x]:
+            if start is None:
+                start = x
+        else:
+            if start is not None and start > 0:
+                gaps.append((x - start, start))
+            start = None
+
+    if not gaps:
+        return lockup
+
+    width, cut = max(gaps)
+    # Um separador real e bem mais largo que o espacamento entre letras.
+    if width < max(4, int(w * GAP_RATIO)):
+        return lockup
+
+    return _trim(lockup.crop((0, 0, cut, h)))
+
+
 def load_art():
-    """Devolve (pin, lockup), ambos ja recortados e em RGBA."""
-    lockup = _trim(Image.open(SRC).convert("RGBA"))
-    pin = _trim(lockup.crop((0, 0, ICON_SPLIT, lockup.height)))
-    return pin, lockup
+    """
+    Devolve (icon_art, lockup), ambos recortados e em RGBA.
+
+    lockup   -> logotipo completo, usado nas splashes.
+    icon_art -> logo-icon.png quando existir; senao, o simbolo extraido.
+    """
+    lockup = _trim(Image.open(SPLASH_SRC).convert("RGBA"))
+
+    if os.path.exists(ICON_SRC):
+        return _trim(Image.open(ICON_SRC).convert("RGBA")), lockup
+
+    return _split_symbol(lockup), lockup
 
 
 def fit(art, size, ratio, canvas=None, bg=BG, alpha=False):
@@ -79,7 +128,7 @@ def monochrome(art, size, ratio):
 
 
 def main():
-    pin, lockup = load_art()
+    icon_art, lockup = load_art()
 
     # ---------------------------------------------------------- Android
     # Densidades do launcher. ic_launcher/_round sao os icones legados
@@ -89,15 +138,15 @@ def main():
 
     for d, px in dens.items():
         mip = os.path.join(res, f"mipmap-{d}")
-        # Icone legado: pin sobre o roxo, ocupando 68% do quadro.
-        save(fit(pin, px, 0.68), os.path.join(mip, "ic_launcher.png"))
-        save(fit(pin, px, 0.68), os.path.join(mip, "ic_launcher_round.png"))
+        # Icone legado: simbolo sobre o roxo, ocupando 68% do quadro.
+        save(fit(icon_art, px, 0.68), os.path.join(mip, "ic_launcher.png"))
+        save(fit(icon_art, px, 0.68), os.path.join(mip, "ic_launcher_round.png"))
         # Adaptive: a arte vive na safe zone central (~66% de 108dp),
         # por isso o ratio menor — as bordas podem ser mascaradas.
         fg = round(px * 108 / 48)
-        save(fit(pin, fg, 0.46, alpha=True),
+        save(fit(icon_art, fg, 0.46, alpha=True),
              os.path.join(mip, "ic_launcher_foreground.png"))
-        save(monochrome(pin, fg, 0.46),
+        save(monochrome(icon_art, fg, 0.46),
              os.path.join(mip, "ic_launcher_monochrome.png"))
 
     # Splash Android: lockup centralizado. Portrait e landscape por densidade.
@@ -125,13 +174,13 @@ def main():
     # ---------------------------------------------------------- iOS
     ios = os.path.join(ROOT, "ios", "App", "App", "Assets.xcassets")
     # A App Store rejeita icone com alfa: gravado como RGB opaco.
-    save(fit(pin, 1024, 0.68),
+    save(fit(icon_art, 1024, 0.68),
          os.path.join(ios, "AppIcon.appiconset", "AppIcon-512@2x.png"), rgba=False)
 
     # Splash universal 2732x2732: o iOS recorta esse quadrado para preencher
     # a tela, entao so a regiao central e garantida. O ratio fica abaixo do
     # usado no Android para a logo nao ser cortada em telas alongadas.
-    sp = fit(lockup, 2732, 0.60)
+    sp = fit(lockup, 2732, 0.46)
     for name in ("splash-2732x2732.png", "splash-2732x2732-1.png",
                  "splash-2732x2732-2.png"):
         save(sp, os.path.join(ios, "Splash.imageset", name), rgba=False)
@@ -141,7 +190,9 @@ def main():
     save(fit(lockup, 0, 0.86, canvas=(512, 178), alpha=True),
          os.path.join(www, "logo.png"))
 
-    print("Assets gerados a partir de", os.path.relpath(SRC, ROOT))
+    src = ICON_SRC if os.path.exists(ICON_SRC) else "simbolo extraido do logotipo"
+    print("Splashes:", os.path.relpath(SPLASH_SRC, ROOT))
+    print("Icones:  ", os.path.relpath(src, ROOT) if os.path.exists(ICON_SRC) else src)
 
 
 if __name__ == "__main__":
