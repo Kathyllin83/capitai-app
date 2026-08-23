@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Paleta da marca Captaí. -->
+    <color name="brandPurple">#1A0849</color>
+    <color name="brandPurpleDark">#120533</color>
+
+    <color name="colorPrimary">#1A0849</color>
+    <color name="colorPrimaryDark">#120533</color>
+    <!-- Magenta do "+" do logotipo. -->
+    <color name="colorAccent">#FF1E8E</color>
+</resources>

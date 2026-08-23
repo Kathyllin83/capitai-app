@@ -1,0 +1,30 @@
+node_modules/
+dist/
+www/bridge.iife.js
+
+# iOS
+ios/App/Pods/
+ios/App/Podfile.lock
+ios/App/App/public/
+ios/App/output/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+
+# Android
+android/.gradle/
+android/build/
+android/app/build/
+android/app/src/main/assets/public/
+android/local.properties
+android/.idea/
+*.iml
+*.keystore
+android/key.properties
+!debug.keystore
+
+.DS_Store
+
+# Editor
+.idea/
+.vscode/
