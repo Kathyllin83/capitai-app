@@ -198,13 +198,13 @@ def main():
         "xxhdpi": (960, 1600), "xxxhdpi": (1280, 1920),
     }
     for d, (w, h) in splash.items():
-        port = add_credit(fit(lockup, 0, 0.58, canvas=(w, h)))
-        land = add_credit(fit(lockup, 0, 0.48, canvas=(h, w)))
+        port = add_credit(fit(lockup, 0, 0.86, canvas=(w, h)))
+        land = add_credit(fit(lockup, 0, 0.62, canvas=(h, w)))
         save(port, os.path.join(res, f"drawable-port-{d}", "splash.png"), rgba=False)
         save(land, os.path.join(res, f"drawable-land-{d}", "splash.png"), rgba=False)
 
     # drawable/splash.png: fallback sem qualificador de densidade.
-    save(add_credit(fit(lockup, 0, 0.58, canvas=(480, 800))),
+    save(add_credit(fit(lockup, 0, 0.86, canvas=(480, 800))),
          os.path.join(res, "drawable", "splash.png"), rgba=False)
 
     # Android 12+: usa a marca completa como icone do splash para nao cortar
@@ -223,7 +223,7 @@ def main():
     # usado no Android para a logo nao ser cortada em telas alongadas.
     # A margem maior compensa o recorte: num iPhone alongado o rodape do
     # quadrado fica fora da tela, e um credito colado na borda sumiria.
-    sp = add_credit(fit(lockup, 2732, 0.46), ratio=0.019, margin=0.245)
+    sp = add_credit(fit(lockup, 2732, 0.52), ratio=0.019, margin=0.245)
     for name in ("splash-2732x2732.png", "splash-2732x2732-1.png",
                  "splash-2732x2732-2.png"):
         save(sp, os.path.join(ios, "Splash.imageset", name), rgba=False)
