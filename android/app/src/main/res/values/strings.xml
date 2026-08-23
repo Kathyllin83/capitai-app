@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Rede</string>
-    <string name="title_activity_main">Rede</string>
+    <string name="app_name">RL 55</string>
+    <string name="title_activity_main">RL 55</string>
     <string name="package_name">io.capitai.raquel</string>
     <string name="custom_url_scheme">io.capitai.raquel</string>
 </resources>

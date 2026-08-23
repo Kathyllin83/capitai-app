@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'io.capitai.raquel',
-  appName: 'Rede',
+  appName: 'RL 55',
   webDir: 'www',
 
   server: {
