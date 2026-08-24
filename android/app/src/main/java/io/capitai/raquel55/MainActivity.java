@@ -1,4 +1,4 @@
-package io.capitai.raquel;
+package io.capitai.raquel55;
 
 import com.getcapacitor.BridgeActivity;
 

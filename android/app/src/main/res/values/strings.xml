@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">RL 55</string>
     <string name="title_activity_main">RL 55</string>
-    <string name="package_name">io.capitai.raquel</string>
-    <string name="custom_url_scheme">io.capitai.raquel</string>
+    <string name="package_name">io.capitai.raquel55</string>
+    <string name="custom_url_scheme">io.capitai.raquel55</string>
 </resources>

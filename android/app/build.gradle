@@ -10,10 +10,10 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace "io.capitai.raquel"
+    namespace "io.capitai.raquel55"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "io.capitai.raquel"
+        applicationId "io.capitai.raquel55"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
