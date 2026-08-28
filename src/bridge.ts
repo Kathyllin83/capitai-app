@@ -6,7 +6,7 @@ import { SplashScreen } from '@capacitor/splash-screen';
 import { deviceService } from './services/DeviceService';
 import { DeviceError } from './types/device';
 
-const APP_HOST = 'rl55.capitai.io';
+const APP_HOST = 'capitai.io';
 
 /**
  * Expoe o DeviceService no `window` para que a aplicacao web carregada
