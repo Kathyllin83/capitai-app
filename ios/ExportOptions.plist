@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- app-store-connect: destino de producao (TestFlight + App Store). -->
+	<key>method</key>
+	<string>app-store-connect</string>
+
+	<key>teamID</key>
+	<string>V6Z3363QBK</string>
+
+	<!-- Assinatura automatica: o Xcode busca o perfil de distribuicao da conta. -->
+	<key>signingStyle</key>
+	<string>automatic</string>
+
+	<!-- Sobe o .ipa direto para o App Store Connect ao final do export. -->
+	<key>destination</key>
+	<string>upload</string>
+
+	<!-- Symbols de crash legiveis no Organizer / App Store Connect. -->
+	<key>uploadSymbols</key>
+	<true/>
+
+	<!-- Sem bitcode: descontinuado desde o Xcode 14. -->
+	<key>stripSwiftSymbols</key>
+	<true/>
+
+	<!-- Deixa o App Store Connect atribuir o build number automaticamente,
+	     evitando erro de "build ja existente" ao reenviar. -->
+	<key>manageAppVersionAndBuildNumber</key>
+	<true/>
+</dict>
+</plist>

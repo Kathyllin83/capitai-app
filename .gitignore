@@ -32,3 +32,6 @@ android/key.properties
 # Artefatos de publicacao (bundles assinados nao vao para o repositorio)
 play-store/*.aab
 play-store/*.apk
+ios/output/
+*.ipa
+*.xcarchive
