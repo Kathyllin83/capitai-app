@@ -28,3 +28,7 @@ android/key.properties
 # Editor
 .idea/
 .vscode/
+
+# Artefatos de publicacao (bundles assinados nao vao para o repositorio)
+play-store/*.aab
+play-store/*.apk
