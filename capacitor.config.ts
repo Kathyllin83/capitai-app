@@ -1,17 +1,17 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.capitai.raquel',
-  appName: 'RL 55',
+  appId: 'io.capitai.app',
+  appName: 'Captaí+',
   webDir: 'www',
 
   server: {
     // A WebView carrega diretamente a aplicacao web existente.
-    url: 'https://rl55.capitai.io/login/agente',
+    url: 'https://capitai.io/login/agente',
     cleartext: false,
     // Restringe a navegacao dentro da WebView ao dominio da aplicacao.
     // Qualquer outro host cai no openExternalUrl e abre no navegador do dispositivo.
-    allowNavigation: ['rl55.capitai.io'],
+    allowNavigation: ['capitai.io'],
   },
 
   ios: {
@@ -31,7 +31,7 @@ const config: CapacitorConfig = {
     SplashScreen: {
       // A splash e dispensada pelo proprio Capacitor quando a WebView termina
       // de carregar. Nao dependemos do JS remoto: o bundle publicado em
-      // rl55.capitai.io/bridge.iife.js ainda e uma versao antiga, sem
+      // capitai.io/bridge.iife.js ainda e uma versao antiga, sem
       // hideSplash(). Com launchAutoHide: false a splash ficaria presa ate o
       // timeout em toda abertura do app.
       //

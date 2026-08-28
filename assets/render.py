@@ -21,7 +21,10 @@ from PIL import Image, ImageDraw, ImageFont
 BG = (0x1A, 0x08, 0x49)          # roxo da marca
 
 # Credito no rodape das splashes.
-CREDIT = "powered by Captaí+"
+# Vazio: o app agora e o proprio Captai+, entao creditar a plataforma
+# sob o seu proprio logotipo seria redundante. Preencher esta string
+# volta a estampar o credito no rodape das splashes.
+CREDIT = ""
 CREDIT_COLOR = (0xFF, 0xFF, 0xFF)
 CREDIT_ALPHA = 150               # discreto: nao compete com o logotipo
 CREDIT_FONTS = (
@@ -134,6 +137,9 @@ def add_credit(img, ratio=0.030, margin=0.055):
     `ratio` e `margin` sao fracoes da menor dimensao do canvas, entao o texto
     mantem a mesma proporcao em todas as densidades e nas duas orientacoes.
     """
+    if not CREDIT:
+        return img
+
     base = min(img.size)
     font = _credit_font(max(9, round(base * ratio)))
     draw = ImageDraw.Draw(img)
@@ -207,9 +213,13 @@ def main():
     save(add_credit(fit(lockup, 0, 0.86, canvas=(480, 800))),
          os.path.join(res, "drawable", "splash.png"), rgba=False)
 
-    # Android 12+: usa a marca completa como icone do splash para nao cortar
-    # o texto no topo da inicializacao do sistema.
-    save(fit(lockup, 1024, 0.70, alpha=True),
+    # Android 12+: o sistema mascara windowSplashScreenAnimatedIcon num
+    # CIRCULO e descarta tudo que sobra fora dele. Um lockup horizontal nao
+    # cabe nesse recorte — as pontas (o "+" e a cauda do pin) somem. Por isso
+    # aqui vai so o simbolo, e num ratio que respeita a safe zone: o icone
+    # ocupa 240dp de um quadro de 288dp, e a arte precisa caber no circulo
+    # inscrito nesses 240dp — dai o 0.58, que deixa margem ate a borda.
+    save(fit(icon_art, 1024, 0.58, alpha=True),
          os.path.join(res, "drawable", "splash_foreground.png"))
 
     # ---------------------------------------------------------- iOS
@@ -218,12 +228,19 @@ def main():
     save(fit(icon_art, 1024, 0.68),
          os.path.join(ios, "AppIcon.appiconset", "AppIcon-512@2x.png"), rgba=False)
 
-    # Splash universal 2732x2732: o iOS recorta esse quadrado para preencher
-    # a tela, entao so a regiao central e garantida. O ratio fica abaixo do
-    # usado no Android para a logo nao ser cortada em telas alongadas.
-    # A margem maior compensa o recorte: num iPhone alongado o rodape do
-    # quadrado fica fora da tela, e um credito colado na borda sumiria.
-    sp = add_credit(fit(lockup, 2732, 0.52), ratio=0.019, margin=0.245)
+    # Splash universal 2732x2732: o iOS faz aspectFill desse quadrado, entao
+    # num aparelho retrato so a FAIXA CENTRAL sobrevive — as laterais saem da
+    # tela. O caso mais estreito e o iPhone 15 Pro (1179x2556): sobram
+    # 1179 / (2556/2732) = 1260px dos 2732, ou seja 46% da largura.
+    #
+    # `fit` mede o ratio contra o lado do quadrado, nao contra o que fica
+    # visivel — por isso o ratio aqui e sobre 2732, mas o teto real e 0.46.
+    # 0.40 deixa a logo em ~1093px, com 13% de folga ate a borda do corte.
+    # Um lockup mais largo que 2.86:1 exige baixar esse numero de novo.
+    #
+    # A margem do credito e grande pelo mesmo motivo: o rodape do quadrado
+    # fica fora da tela, e um credito colado na borda sumiria.
+    sp = add_credit(fit(lockup, 2732, 0.40), ratio=0.019, margin=0.245)
     for name in ("splash-2732x2732.png", "splash-2732x2732-1.png",
                  "splash-2732x2732-2.png"):
         save(sp, os.path.join(ios, "Splash.imageset", name), rgba=False)
