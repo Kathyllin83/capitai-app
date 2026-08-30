@@ -28,6 +28,12 @@
 	<string>Precisamos acessar a câmera para registrar fotos durante a coleta.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Precisamos acessar sua localização para registrar corretamente o local da coleta.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Precisamos acessar sua localização para registrar corretamente o local da coleta.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Precisamos acessar suas fotos para você anexar imagens da coleta.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Precisamos salvar na sua galeria as fotos registradas durante a coleta.</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>whatsapp</string>
