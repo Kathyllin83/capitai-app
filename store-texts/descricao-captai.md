@@ -7,7 +7,7 @@ Captaí+
 Coleta em campo com GPS
 
 ## Descrição curta (Play Store, 80 caracteres)
-Coleta de dados em campo com GPS, foto e horário em cada registro.
+Coleta em campo com GPS, foto e horário.
 
 ## Descrição completa
 

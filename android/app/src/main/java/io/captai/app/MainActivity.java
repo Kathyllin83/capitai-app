@@ -1,4 +1,4 @@
-package io.capitai.app;
+package io.captai.app;
 
 import com.getcapacitor.BridgeActivity;
 
